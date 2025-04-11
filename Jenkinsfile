@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        AWS_DEFAULT_REGION = 'us-east-1'
+        AWS_DEFAULT_REGION = 'ap-south-1' // change if needed
     }
 
     stages {
@@ -15,7 +15,10 @@ pipeline {
         stage('Upload index.html to S3') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-s3-creds']]) {
-                    sh 'aws s3 cp index.html s3://ank915/index.html --acl public-read'
+                    sh '''
+                        echo "Uploading index.html to S3..."
+                        aws s3 cp index.html s3://ank915/index.html --acl public-read
+                    '''
                 }
             }
         }

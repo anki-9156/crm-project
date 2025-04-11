@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-1'
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -8,16 +12,11 @@ pipeline {
             }
         }
 
-        stage('Upload to S3') {
+        stage('Upload index.html to S3') {
             steps {
-                // This uses the S3 plugin's configured profile
-                s3Upload(
-                    bucket: 'ank915',
-                    path: '/',
-                    file: 'index.html',
-                    profileName: 'aws-s3-profile', // replace with your actual profile name if it's not 'default'
-                    acl: 'PublicRead'
-                )
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-s3-creds']]) {
+                    sh 'aws s3 cp index.html s3://ank915/index.html --acl public-read'
+                }
             }
         }
     }

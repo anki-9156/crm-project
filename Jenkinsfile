@@ -1,23 +1,24 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    AWS_DEFAULT_REGION = 'us-east-1' // Change if needed
-  }
-
-  stages {
-    stage('Checkout Code') {
-      steps {
-        git 'https://github.com/anki-9156/crm-project.git'
-      }
-    }
-
-    stage('Deploy to S3') {
-      steps {
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-s3-creds']]) {
-          sh 'aws s3 cp index.html s3://ank915/index.html'
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/anki-9156/crm-project.git'
+            }
         }
-      }
+
+        stage('Upload to S3') {
+            steps {
+                // This uses the S3 plugin's configured profile
+                s3Upload(
+                    bucket: 'ank915',
+                    path: '/',
+                    file: 'index.html',
+                    profileName: 'aws-s3-profile', // replace with your actual profile name if it's not 'default'
+                    acl: 'PublicRead'
+                )
+            }
+        }
     }
-  }
 }

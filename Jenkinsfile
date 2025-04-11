@@ -2,39 +2,22 @@ pipeline {
   agent any
 
   environment {
-    AWS_DEFAULT_REGION = 'us-east-1' // change if needed
-  }
-
-  tools {
-    nodejs "NodeJS" // Make sure NodeJS is configured in Jenkins tools
+    AWS_DEFAULT_REGION = 'us-east-1' // Change if needed
   }
 
   stages {
-    stage('Checkout') {
+    stage('Checkout Code') {
       steps {
         git 'https://github.com/anki-9156/crm-project.git'
-      }
-    }
-
-    stage('Install Dependencies') {
-      steps {
-        sh 'npm install'
-      }
-    }
-
-    stage('Build React App') {
-      steps {
-        sh 'npm run build'
       }
     }
 
     stage('Deploy to S3') {
       steps {
         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-s3-creds']]) {
-          sh 'aws s3 cp build/ s3://ank915/ --recursive'
+          sh 'aws s3 cp index.html s3://ank915/index.html'
         }
       }
     }
   }
 }
-
